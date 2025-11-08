@@ -1,3 +1,7 @@
 export { useWallet } from './useWallet'
 export { useBalance } from './useBalance'
 export { useToast } from './use-toast'
+export { useProgram } from './useProgram'
+export { useMarkets } from './useMarkets'
+export { useMarket } from './useMarket'
+export { useUserPositions } from './useUserPositions'

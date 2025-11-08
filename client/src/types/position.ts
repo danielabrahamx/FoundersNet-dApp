@@ -19,3 +19,8 @@ export interface UserPosition {
   /** Timestamp of the last trade */
   lastTradeAt: number;
 }
+
+/**
+ * Type alias for UserPosition
+ */
+export type Position = UserPosition;
