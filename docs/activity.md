@@ -90,3 +90,89 @@ Initialize the FoundersNet dApp project with the following structure:
 - Complete src/ directory with organized structure
 - todo.md with detailed task tracking
 - activity.md (this file)
+
+---
+
+## 2024-11-08 - Solana Connection & Wallet Provider Setup
+
+### Prompt 3: Solana Connection & Wallet Provider Setup
+
+**User Request:**
+Set up Solana blockchain connection and wallet adapter integration:
+1. Create `/client/src/lib/solana.ts` with Connection instance and RPC configuration
+2. Create `/client/src/App.tsx` with comprehensive provider setup (Connection, Wallet, Modal, Query, Router)
+3. Create `/client/src/hooks/useWallet.ts` custom hook with balance helper
+4. Create `/client/src/main.tsx` entry point with React.StrictMode and Toaster
+5. Do NOT create any UI components yet - only provider setup and connection logic
+
+**Actions Taken:**
+
+1. **Created `/client/src/lib/solana.ts`**
+   - Exported `connection` instance using @solana/web3.js Connection class
+   - Configured to use VITE_SOLANA_RPC_ENDPOINT environment variable
+   - Set commitment level to "confirmed" for optimal transaction confirmation
+   - Fallback to https://api.devnet.solana.com if env var not set
+   - Exported `NETWORK` constant set to "devnet"
+
+2. **Updated `/client/src/App.tsx`**
+   - Added wallet provider setup with proper nesting order:
+     * ConnectionProvider (Solana RPC endpoint)
+     * WalletProvider (wallet adapters with autoConnect enabled)
+     * WalletModalProvider (wallet selection UI)
+     * QueryClientProvider (TanStack Query caching)
+     * BrowserRouter (React Router navigation)
+   - Configured wallet adapters: PhantomWalletAdapter, SolflareWalletAdapter, TrustWalletAdapter
+     * Note: BackpackWalletAdapter not available in @solana/wallet-adapter-wallets v0.19.37, used TrustWalletAdapter as equally popular alternative
+   - Imported wallet adapter CSS: '@solana/wallet-adapter-react-ui/styles.css'
+   - Updated QueryClient configuration:
+     * staleTime: 30_000 ms (30 seconds) per design-notes.md specifications
+     * refetchOnWindowFocus: true for data freshness
+   - Used useMemo for wallet adapters array to prevent unnecessary re-instantiation
+   - Imported environment variable with fallback for RPC endpoint
+
+3. **Created `/client/src/hooks/useWallet.ts`**
+   - Custom hook wrapping @solana/wallet-adapter-react's useWallet
+   - Destructured exports: publicKey, connected, connecting, disconnect, connect, wallet
+   - Added `getBalance()` async helper function:
+     * Accepts no parameters
+     * Returns balance in lamports as number
+     * Returns 0 if wallet not connected (publicKey is null)
+     * Includes error handling with console logging
+   - Clean API for components to interact with wallet state
+
+4. **Verified `/client/src/main.tsx`**
+   - Already correctly configured with React.StrictMode wrapping App
+   - Toaster component included in App.tsx for notifications
+   - No changes needed - implementation was complete
+
+5. **Updated `/client/tsconfig.json`**
+   - Added "types": ["vite/client"] to TypeScript compiler options
+   - Resolved import.meta.env type recognition
+   - Enabled proper IDE support and type checking for Vite environment variables
+
+6. **Removed root-level activity.md**
+   - Cleaned up misplaced activity.md file
+   - All activity now properly tracked in docs/activity.md per claude.md guidelines
+
+**Technical Details:**
+
+- **Provider Order:** Correct nesting ensures each provider can access dependencies from outer providers
+- **Wallet Adapters:** Used useMemo hook to memoize wallet adapters, preventing unnecessary recreations on re-render
+- **Error Handling:** getBalance() includes try-catch with console error logging for troubleshooting
+- **Environment Variables:** RPC endpoint uses VITE_ prefix for Vite's client-side env support
+- **Type Safety:** Added Vite client types for import.meta.env proper typing in strict TypeScript mode
+
+**Verification Results:**
+
+- ✅ TypeScript compilation successful (npx tsc --noEmit) - No type errors
+- ✅ Production build successful (npm run build)
+- ✅ Bundle size: 626.22 kB minified (194.14 kB gzipped)
+- ✅ No unused imports or variables
+- ✅ All dependencies properly resolved
+
+**Files Created/Modified:**
+- client/src/lib/solana.ts (new) - Solana connection configuration
+- client/src/hooks/useWallet.ts (new) - Custom wallet hook
+- client/src/App.tsx (modified) - Provider setup
+- client/tsconfig.json (modified) - Vite type support
+- docs/activity.md (this file, appended)
