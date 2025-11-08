@@ -1,6 +1,5 @@
-// Placeholder for layout components
-// This will contain header, footer, and navigation components
-
-export const Header = () => {
-  return <div>Header Component</div>
-}
+export { Header } from './Header'
+export { Footer } from './Footer'
+export { Layout } from './Layout'
+export { DevnetBadge } from './DevnetBadge'
+export { ThemeToggle } from './ThemeToggle'
