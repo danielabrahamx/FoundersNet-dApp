@@ -1,5 +1,16 @@
-// Market types
-export interface Market {
+// Export all type definitions
+export * from './market';
+export * from './position';
+export * from './trade';
+
+// Legacy types for backward compatibility
+import { MarketCategory, MarketOutcome } from './market';
+
+/**
+ * Legacy Market interface for backward compatibility
+ * @deprecated Use Market from './market' instead
+ */
+export interface LegacyMarket {
   publicKey: string
   account: {
     title: string
@@ -15,30 +26,9 @@ export interface Market {
   }
 }
 
-export enum MarketCategory {
-  SPORTS = 'Sports',
-  POLITICS = 'Politics',
-  CRYPTO = 'Crypto',
-  ENTERTAINMENT = 'Entertainment',
-  OTHER = 'Other'
-}
-
-export enum MarketOutcome {
-  YES = 'YES',
-  NO = 'NO',
-  INVALID = 'INVALID'
-}
-
-// User position types
-export interface UserPosition {
-  marketPublicKey: string
-  market: Market
-  outcome: MarketOutcome
-  shares: number
-  costBasis: number
-}
-
-// Transaction types
+/**
+ * Transaction types
+ */
 export interface Transaction {
   signature: string
   type: TransactionType
@@ -64,14 +54,18 @@ export enum TransactionStatus {
   FAILED = 'FAILED'
 }
 
-// Wallet types
+/**
+ * Wallet types
+ */
 export interface WalletInfo {
   publicKey: string
   balance: number
   connected: boolean
 }
 
-// Form types
+/**
+ * Form types
+ */
 export interface CreateMarketForm {
   title: string
   description: string
