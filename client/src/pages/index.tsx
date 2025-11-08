@@ -1,6 +1,3 @@
-// Placeholder for page components
-// This will contain the main page components
-
-export const HomePage = () => {
-  return <div>Home Page</div>
-}
+export { HomePage } from './HomePage'
+export { PortfolioPage } from './PortfolioPage'
+export { CreateMarketPage } from './CreateMarketPage'
