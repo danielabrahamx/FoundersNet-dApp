@@ -7,8 +7,16 @@ This document provides the first 10 prompts to guide an AI coding agent through 
 ## Prompt 1: Project Initialization & Configuration
 
 ```
+
 Initialize the FoundersNet dApp project with the following structure:
 
+Please review the following files in my projects directory:
+claude.md
+tech-stack.md
+design-notes.md
+requirements.md
+
+Then:
 1. Create a Vite + React + TypeScript project in `/client` directory
 2. Install and configure all dependencies from tech-stack.md:
    - Core: React 18+, TypeScript, Vite
