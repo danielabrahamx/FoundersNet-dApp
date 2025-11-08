@@ -1,3 +1,4 @@
-export { HomePage } from './HomePage'
+export { Markets } from './HomePage'
+export { MarketDetail } from './MarketDetail'
 export { PortfolioPage } from './PortfolioPage'
 export { CreateMarketPage } from './CreateMarketPage'
