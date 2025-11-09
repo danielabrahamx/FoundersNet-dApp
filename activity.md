@@ -478,3 +478,165 @@ Existing infrastructure available:
 ✅ **Requirements**: All REQ-VIEW-001, REQ-MARKET-003 to REQ-MARKET-005 satisfied
 
 The Market Listing view is now fully functional with filtering, sorting, responsive design, and proper loading/empty states!
+
+---
+
+## 2025-06-17 - Market Detail View - Info & Stats
+
+### Prompt 8: Market Detail View - Info & Stats
+
+```
+Create the Market Detail view layout with market information and statistics.
+
+Reference: design-notes.md Section 3.B (Market Detail View) and requirements.md REQ-VIEW-002, REQ-VIEW-008
+```
+
+### Analysis of Current State
+
+Existing infrastructure available:
+- MarketDetail.tsx exists as basic placeholder
+- useMarket hook available with mock data
+- All UI components available (Card, Badge, Button, Skeleton, Alert)
+- Utilities available (formatSol, getTimeRemaining, lamportsToSol, calculateImpliedOdds)
+- date-fns and recharts installed
+- Market type definitions complete
+- Responsive design patterns established
+
+### Changes Made
+
+✅ **Created `/client/src/components/market/MarketHeader.tsx`**
+- Market title with text-3xl font-bold styling
+- Category badge with color coding:
+  * Sports: Blue
+  * Politics: Purple  
+  * Crypto: Orange
+  * Entertainment: Pink
+  * Other: Gray
+- Status indicator (Open/Resolved) with appropriate colors
+- Resolution date with time remaining calculation
+- Handles past resolution dates with "Resolution pending" message
+- Uses getTimeRemaining utility for accurate time calculations
+
+✅ **Created `/client/src/components/market/MarketDescription.tsx`**
+- Card component with "Description" title
+- Full description text with line break preservation
+- Read more/less toggle for descriptions > 500 characters
+- Resolution criteria section with explanatory text
+- Consistent styling with Shadcn Card components
+
+✅ **Created `/client/src/components/market/MarketStats.tsx`**
+- Card component with market statistics
+- Total Pool display (large, bold, centered)
+- YES Pool: "◎60 (60%)" in green with percentage
+- NO Pool: "◎40 (40%)" in red with percentage  
+- Total Volume using market.totalVolume
+- Participants count (placeholder: 5-24 traders)
+- Created date using date-fns formatDistanceToNow
+- All SOL amounts formatted with formatSol utility
+
+✅ **Created `/client/src/components/market/PoolChart.tsx`**
+- Card component with "Pool Distribution" title
+- Bar chart using Recharts library
+- Two bars: YES (green) and NO (red)
+- Shows values in SOL with percentages in tooltip
+- Responsive chart container (h-48)
+- Custom tooltip showing amount and percentage
+- Total pool display below chart
+- TODO comment for future historical tracking
+
+✅ **Created `/client/src/components/market/MarketDetailSkeleton.tsx`**
+- Complete skeleton loading state matching final layout
+- Two-column structure with proper spacing
+- Skeleton elements for all components
+- Maintains layout structure during loading
+- Uses Shadcn Skeleton component
+
+✅ **Created `/client/src/components/ui/alert.tsx`**
+- Shadcn UI Alert component for error states
+- Support for default and destructive variants
+- AlertTitle and AlertDescription subcomponents
+- Used for "Market Not Found" error message
+
+✅ **Updated `/client/src/pages/MarketDetail.tsx`**
+- Complete two-column layout implementation
+- Left column (2/3 width): MarketHeader + MarketDescription + Trading widget placeholder
+- Right column (1/3 width): PoolChart + MarketStats
+- Mobile: Single column stacked layout
+- Integration with useMarket(marketId) hook
+- Loading state with MarketDetailSkeleton
+- Error handling for market not found with helpful navigation
+- Back navigation button to return to Markets
+- Responsive design using lg:grid and lg:gap-8
+
+✅ **Updated `/client/src/components/market/index.tsx`**
+- Exported all new components
+- Maintained existing exports (MarketCard, MarketList)
+
+### Key Features Implemented
+
+✅ **Layout Structure**:
+- Two-column desktop layout (2/3 + 1/3)
+- Mobile responsive single column
+- Consistent spacing with Tailwind utilities
+- Proper component organization
+
+✅ **Market Information Display**:
+- Complete market header with all required elements
+- Category and status badges with color coding
+- Resolution date with time remaining
+- Full description with read more/less functionality
+
+✅ **Statistics & Visualization**:
+- Comprehensive market stats card
+- Pool distribution chart with Recharts
+- Percentage calculations and formatting
+- All monetary values properly formatted
+
+✅ **Data Integration**:
+- Uses useMarket hook for data fetching
+- Proper error handling for missing markets
+- Loading states with skeleton components
+- TypeScript strict compliance
+
+✅ **Responsive Design**:
+- Mobile-first approach
+- Proper breakpoint usage (lg:grid, lg:col-span-2)
+- Touch-friendly interface elements
+- Consistent padding and spacing
+
+### Technical Implementation Details
+
+**Data Flow**:
+1. MarketDetail page gets marketId from URL params
+2. useMarket(marketId) fetches market data (mock for now)
+3. Components receive market data as props
+4. Each component handles its specific display logic
+
+**Chart Implementation**:
+- Recharts BarChart with custom styling
+- Green bar for YES, red bar for NO
+- Custom tooltip with amounts and percentages
+- Responsive container with proper dimensions
+
+**Date & Time Handling**:
+- getTimeRemaining utility for countdown logic
+- formatDistanceToNow for relative dates
+- Proper timezone handling
+- Past date resolution detection
+
+**SOL Formatting**:
+- All amounts use formatSol utility
+- Consistent ◎ symbol usage
+- Proper decimal places (2)
+- Lamports to SOL conversion
+
+### Validation
+
+✅ **Build Success**: Application builds successfully with no errors
+✅ **TypeScript Check**: No compilation errors, strict mode passes
+✅ **Linting**: No unused imports or variables
+✅ **Responsive**: Proper mobile/tablet/desktop layouts
+✅ **Accessibility**: Semantic HTML, proper ARIA attributes
+✅ **Requirements**: All REQ-VIEW-002, REQ-VIEW-008 requirements satisfied
+
+The Market Detail view is now fully implemented with comprehensive information display, statistics, and responsive design!
