@@ -1,7 +1,7 @@
 import { useParams, Link } from 'react-router-dom'
 import { useMarket } from '@/hooks'
 import { Button } from '@/components/ui/button'
-import { MarketHeader, MarketDescription, MarketStats, PoolChart, MarketDetailSkeleton } from '@/components/market'
+import { MarketHeader, MarketDescription, MarketStats, PoolChart, MarketDetailSkeleton, TradingWidget } from '@/components/market'
 import { AlertCircle, ArrowLeft } from 'lucide-react'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 
@@ -59,11 +59,7 @@ export function MarketDetail() {
         <div className="lg:col-span-2 space-y-6">
           <MarketHeader market={market} />
           <MarketDescription description={market.description} />
-          
-          {/* Trading widget placeholder - will be implemented in next phase */}
-          <div className="p-6 border-2 border-dashed border-muted rounded-lg text-center">
-            <p className="text-muted-foreground">Trading widget will be implemented here</p>
-          </div>
+          <TradingWidget market={market} />
         </div>
 
         {/* Right Column - 1/3 width */}
