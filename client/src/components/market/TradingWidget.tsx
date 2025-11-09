@@ -8,8 +8,9 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useWallet } from '@/hooks/useWallet';
 import { useBalance } from '@/hooks/useBalance';
 import { useUserPositions } from '@/hooks/useUserPositions';
-import { useToast } from '@/hooks/use-toast';
+import { useTransactionToast } from '@/hooks/useTransactionToast';
 import { calculateNewPoolRatio, calculatePotentialPayout } from '@/lib/calculations';
+import { parseTransactionError } from '@/lib/errors';
 import {
   formatSol,
   lamportsToSol,
@@ -27,7 +28,7 @@ export function TradingWidget({ market }: TradingWidgetProps) {
   const { publicKey, connected } = useWallet();
   const { data: walletBalance = 0 } = useBalance(publicKey);
   const { data: positions = [] } = useUserPositions();
-  const { toast } = useToast();
+  const { showPendingToast, showSuccessToast, showErrorToast } = useTransactionToast();
 
   const [selectedOutcome, setSelectedOutcome] = useState<'yes' | 'no'>('yes');
   const [amount, setAmount] = useState<string>('');
@@ -116,37 +117,46 @@ export function TradingWidget({ market }: TradingWidgetProps) {
     setAmount(maxAmount.toFixed(2));
   };
 
-  const handlePlaceBet = () => {
+  const handlePlaceBet = async () => {
     if (!connected) {
-      toast({
-        title: 'Wallet Not Connected',
-        description: 'Please connect your wallet to place a bet.',
-      });
+      showErrorToast('Wallet not connected');
       return;
     }
 
     if (!isAmountValid) {
-      toast({
-        title: 'Invalid Amount',
-        description: validationError || 'Please enter a valid amount.',
-        variant: 'destructive',
-      });
+      showErrorToast(validationError || 'Please enter a valid amount.');
       return;
     }
 
     if (isMarketClosed) {
-      toast({
-        title: 'Market Closed',
-        description: 'This market is no longer accepting trades.',
-        variant: 'destructive',
-      });
+      showErrorToast('This market is no longer accepting bets');
       return;
     }
 
-    toast({
-      title: 'Coming Soon!',
-      description: 'Blockchain integration coming next!',
-    });
+    try {
+      // Simulate transaction flow for testing
+      const mockSignature = "5Gx7...k3Pm" + Date.now();
+      
+      // Show pending toast
+      showPendingToast(mockSignature);
+      
+      // Simulate network delay
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      
+      // Randomly succeed or fail (for testing)
+      if (Math.random() > 0.3) {
+        showSuccessToast(
+          `Bet of ${formatSol(amountNum)} on ${selectedOutcome.toUpperCase()} placed successfully!`,
+          mockSignature
+        );
+        setAmount('');
+      } else {
+        throw new Error("Insufficient funds");
+      }
+    } catch (error) {
+      const message = parseTransactionError(error as Error);
+      showErrorToast(message);
+    }
   };
 
   let buttonText = 'Place Bet';

@@ -1,6 +1,6 @@
 import { useWallet } from '@solana/wallet-adapter-react'
 import { useWalletModal } from '@solana/wallet-adapter-react-ui'
-import { Wallet, Copy, ExternalLink, LogOut } from 'lucide-react'
+import { Wallet, Copy, ExternalLink, LogOut, Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
   DropdownMenu,
@@ -10,16 +10,16 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { useBalance } from '@/hooks/useBalance'
+import { useAirdrop } from '@/hooks/useAirdrop'
 import { formatSol, truncateAddress } from '@/lib/utils'
 import { useToast } from '@/hooks/use-toast'
-import { connection } from '@/lib/solana'
-import { AIRDROP_AMOUNT } from '@/lib/constants'
 
 export function WalletButton() {
   const { publicKey, disconnect } = useWallet()
   const { setVisible } = useWalletModal()
   const { data: balance } = useBalance(publicKey)
   const { toast } = useToast()
+  const { airdrop, isAirdropping } = useAirdrop()
 
   const handleCopyAddress = async () => {
     if (!publicKey) return
@@ -39,33 +39,8 @@ export function WalletButton() {
     }
   }
 
-  const handleAirdrop = async () => {
-    if (!publicKey) return
-
-    try {
-      const signature = await connection.requestAirdrop(
-        publicKey,
-        AIRDROP_AMOUNT * 1_000_000_000
-      )
-      
-      toast({
-        title: 'Airdrop requested',
-        description: `Requesting ${AIRDROP_AMOUNT} SOL from Devnet faucet...`,
-      })
-
-      await connection.confirmTransaction(signature)
-      
-      toast({
-        title: 'Airdrop successful',
-        description: `${AIRDROP_AMOUNT} SOL added to your wallet`,
-      })
-    } catch (error) {
-      toast({
-        title: 'Airdrop failed',
-        description: error instanceof Error ? error.message : 'Failed to request airdrop',
-        variant: 'destructive',
-      })
-    }
+  const handleAirdrop = () => {
+    airdrop()
   }
 
   const handleViewOnSolscan = () => {
@@ -101,8 +76,19 @@ export function WalletButton() {
           <span className="font-semibold">{formatSol(balance || 0)} SOL</span>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={handleAirdrop}>
-          Airdrop 1 SOL
+        <DropdownMenuItem 
+          onClick={handleAirdrop}
+          disabled={isAirdropping}
+          className="cursor-pointer"
+        >
+          {isAirdropping ? (
+            <>
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              Airdropping...
+            </>
+          ) : (
+            'Airdrop 1 SOL'
+          )}
         </DropdownMenuItem>
         <DropdownMenuItem onClick={handleViewOnSolscan}>
           <ExternalLink className="mr-2 h-4 w-4" />
