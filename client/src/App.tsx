@@ -14,6 +14,7 @@ import {
 import '@solana/wallet-adapter-react-ui/styles.css'
 import { Toaster } from '@/components/ui/toaster'
 import { Layout } from '@/components/layout'
+import { ErrorBoundary } from '@/components/ErrorBoundary'
 import { ProtectedRoute } from '@/components/ProtectedRoute'
 import { Markets, MarketDetail, PortfolioPage, CreateMarketPage } from '@/pages'
 
@@ -39,39 +40,41 @@ function App() {
   )
 
   return (
-    <ConnectionProvider endpoint={endpoint}>
-      <WalletProvider wallets={wallets} autoConnect>
-        <WalletModalProvider>
-          <QueryClientProvider client={queryClient}>
-            <BrowserRouter>
-              <Routes>
-                <Route path="/" element={<Layout />}>
-                  <Route index element={<Markets />} />
-                  <Route path="market/:marketId" element={<MarketDetail />} />
-                  <Route 
-                    path="portfolio" 
-                    element={
-                      <ProtectedRoute>
-                        <PortfolioPage />
-                      </ProtectedRoute>
-                    } 
-                  />
-                  <Route 
-                    path="create" 
-                    element={
-                      <ProtectedRoute>
-                        <CreateMarketPage />
-                      </ProtectedRoute>
-                    } 
-                  />
-                </Route>
-              </Routes>
-              <Toaster />
-            </BrowserRouter>
-          </QueryClientProvider>
-        </WalletModalProvider>
-      </WalletProvider>
-    </ConnectionProvider>
+    <ErrorBoundary>
+      <ConnectionProvider endpoint={endpoint}>
+        <WalletProvider wallets={wallets} autoConnect>
+          <WalletModalProvider>
+            <QueryClientProvider client={queryClient}>
+              <BrowserRouter>
+                <Routes>
+                  <Route path="/" element={<Layout />}>
+                    <Route index element={<Markets />} />
+                    <Route path="market/:marketId" element={<MarketDetail />} />
+                    <Route 
+                      path="portfolio" 
+                      element={
+                        <ProtectedRoute>
+                          <PortfolioPage />
+                        </ProtectedRoute>
+                      } 
+                    />
+                    <Route 
+                      path="create" 
+                      element={
+                        <ProtectedRoute>
+                          <CreateMarketPage />
+                        </ProtectedRoute>
+                      } 
+                    />
+                  </Route>
+                </Routes>
+                <Toaster />
+              </BrowserRouter>
+            </QueryClientProvider>
+          </WalletModalProvider>
+        </WalletProvider>
+      </ConnectionProvider>
+    </ErrorBoundary>
   )
 }
 
