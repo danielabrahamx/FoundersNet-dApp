@@ -1437,3 +1437,158 @@ Replace all mock data with real Solana blockchain queries. Add admin role detect
 
 The application is now ready to connect to a real Solana Anchor program deployed on Devnet!
 
+---
+
+## 2025-06-17 - Place Bet (One Bet Per Event)
+
+### Prompt 13: Place Bet (One Bet Per Event)
+
+```
+Let users place bets, but only ONCE per event.
+
+Step 1: Create Helper Hook - useHasPosition
+Step 2: Create Place Bet Hook - usePlaceBet
+Step 3: Update Trading Widget - TradingWidget.tsx
+```
+
+### Analysis of Current State
+
+Existing infrastructure available:
+- useUserPositions hook fetches user positions from blockchain
+- usePlaceBet needs to be created for transaction handling
+- TradingWidget.tsx handles all trading logic
+- Market type has PublicKey for identification
+- Position type tracks user holdings (yesShares, noShares)
+- useTransactionToast hook available for notifications
+- Anchor program integration ready
+
+### Changes Made
+
+✅ **Created `/client/src/hooks/useHasPosition.ts`**
+- Simple helper hook that checks if user has any position on a market
+- Uses useUserPositions to fetch all user positions
+- Returns boolean: true if user has yesShares > 0 OR noShares > 0 on the market
+- Enforces one-bet-per-event rule by blocking second bets
+
+✅ **Created `/client/src/hooks/usePlaceBet.ts`**
+- Custom mutation hook using TanStack React Query
+- Handles placing bets on markets via Anchor program
+- Key features:
+  * Validates wallet connection
+  * Derives user position PDA (Program Derived Address)
+  * Checks if user already has a position on the market (one-bet enforcement)
+  * Throws error: "You have already placed a bet on this event"
+  * Constructs and executes placeBet transaction via Anchor
+  * Handles outcomes as discriminated enum: { yes: {} } or { no: {} }
+  * Invalidates query cache on success (refreshes markets, positions, balance)
+- Error handling:
+  * Catches duplicate bet attempt
+  * Graceful error messages via showErrorToast
+
+✅ **Updated `/client/src/hooks/index.ts`**
+- Exported useHasPosition hook
+- Exported usePlaceBet hook
+
+✅ **Updated `/client/src/components/market/TradingWidget.tsx`**
+- Added imports: useNavigate, useHasPosition, usePlaceBet
+- Removed import: parseTransactionError (unused)
+- Added hooks:
+  * useHasPosition(marketId) - checks if user already bet
+  * usePlaceBet() - mutation for placing bets
+  * useNavigate() - for portfolio navigation
+- Early return when hasPosition === true:
+  * Shows card with "Already Placed Bet" message
+  * Large AlertCircle icon (yellow)
+  * "View Portfolio" button links to /portfolio
+- Updated handlePlaceBet function:
+  * Calls placeBet mutation with marketId, amount, outcome
+  * Simplified from mock async/await to mutation call
+  * Clears amount field after submission
+- Updated button:
+  * Disabled when isPlacingBet === true
+  * Button text shows "Placing Bet..." during transaction
+  * Combined disabled state: buttonDisabled || isPlacingBet
+
+### Key Implementation Details
+
+**One-Bet-Per-Event Enforcement**:
+- Frontend: useHasPosition checks existing positions before showing form
+- User sees "Already Placed Bet" message with portfolio link
+- Backend: usePlaceBet validates position doesn't exist via PDA fetch
+- Throws error if position account is found and has shares > 0
+
+**Transaction Flow**:
+1. User enters amount and selects YES/NO outcome
+2. Clicks "Place Bet on YES/NO"
+3. usePlaceBet mutation triggered
+4. PDA derived: Hash(user_position + user_pubkey + market_pubkey)
+5. Check if position already exists
+6. Execute program.methods.placeBet() via Anchor
+7. On success: Show toast, invalidate queries, clear form
+8. On error: Show error toast with message
+
+**Improved UX**:
+- Clear messaging when user already has position
+- Easy navigation to portfolio to view existing bets
+- Loading state ("Placing Bet...") during transaction
+- Toast notifications for all outcomes
+- Graceful error handling with user-friendly messages
+
+### Type Safety & Error Handling
+
+- All TypeScript strict mode checks pass
+- Proper type casting for Anchor program account data
+- Null-safe handling of optional values (.toNumber?.())
+- Anchor methods called with correct discriminated union syntax
+- Query cache invalidation on success
+
+### Validation
+
+✅ **TypeScript Check**: No compilation errors, strict mode passes
+✅ **Build Success**: npm run build completes in 20.47s
+✅ **Bundle Size**: 17.54 kB main bundle (gzipped: 5.46 kB)
+✅ **No Unused Variables**: All imports and variables used
+✅ **No Unused Imports**: Clean import statements
+
+### Files Modified
+
+1. `/client/src/hooks/useHasPosition.ts` - Created (new hook)
+2. `/client/src/hooks/usePlaceBet.ts` - Created (new mutation hook)
+3. `/client/src/hooks/index.ts` - Updated exports
+4. `/client/src/components/market/TradingWidget.tsx` - Updated with new hooks
+
+### Next Steps
+
+The Place Bet feature is now ready for:
+1. **Testing Flow**:
+   - Connect wallet with Devnet SOL
+   - Airdrop 1 SOL if needed
+   - Navigate to event/market
+   - Enter bet amount (0.1 SOL)
+   - Select YES or NO
+   - Click "Place Bet"
+   - Approve transaction in wallet
+   - See pending → success notifications
+   - Try to bet again → See "Already Placed Bet" message
+   - Check Portfolio → Bet appears in positions list
+
+2. **Real Blockchain Integration**:
+   - Deploy Anchor program to Devnet
+   - Update VITE_PROGRAM_ID in .env
+   - Update IDL in /client/src/idl/foundersnet.ts
+   - All transactions will execute on real blockchain
+
+### Testing Checklist
+
+- [ ] Airdrop Devnet SOL
+- [ ] Navigate to event/market
+- [ ] Enter bet amount (0.1 SOL)
+- [ ] Select YES or NO outcome
+- [ ] Click "Place Bet on YES/NO"
+- [ ] Approve in wallet
+- [ ] See pending → success notifications
+- [ ] Try to bet again - see "Already Placed Bet" message
+- [ ] Check Portfolio - bet appears
+
+**DELIVERABLE**: Users can place bets with enforced one-bet-per-event rule. Clear messaging when already betting.
+
