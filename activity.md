@@ -1816,3 +1816,117 @@ The admin event creation feature is fully implemented and ready for:
 7. Redirected to new event page
 8. Non-admin users cannot access admin page
 
+## 2025-11-10 - Portfolio View with Countdown Timers and P&L
+
+### Prompt 15: Portfolio View
+
+**What you're building:** Portfolio page showing user's bets with P&L and countdown timers.
+
+### Step 1: Create Countdown Timer
+
+Created `/client/src/components/CountdownTimer.tsx`:
+- Uses date-fns `formatDistanceToNow` for relative time display
+- Updates every second with useEffect and setInterval
+- Shows "Betting closed" when past resolution date
+- Clock icon from lucide-react for visual clarity
+
+### Step 2: Create Portfolio Summary
+
+Created `/client/src/components/portfolio/PortfolioSummary.tsx`:
+- Three-column responsive grid layout
+- Total Portfolio Value: Sum of all position values
+- Total P&L: Profit/loss with color coding and percentage badge
+- Win Rate: Percentage of winning positions
+- Uses formatSol utility for consistent SOL formatting
+
+### Step 3: Create Position Card
+
+Created `/client/src/components/portfolio/PositionCard.tsx`:
+- Shows startup name, event type badge, bet side (YES/NO)
+- Displays bet amount, current value, and P&L with color coding
+- CountdownTimer for open events, resolution date for resolved
+- "Claim Winnings" button for winning resolved positions (placeholder)
+- Clickable card navigates to event detail page
+- TrendingUp/TrendingDown icons for P&L visualization
+
+### Step 4: Create Portfolio Hook
+
+Created `/client/src/hooks/usePortfolio.ts`:
+- Enriches user positions with market data and calculated metrics
+- Calculates current value based on pool ratios: (your shares / total winning shares) × total pool
+- Computes P&L and percentage returns
+- Determines win/loss status for resolved markets
+- Separates open vs resolved positions for filtering
+- Returns portfolio summary metrics (total value, P&L, win rate)
+
+### Step 5: Update Portfolio Page
+
+Updated `/client/src/pages/PortfolioPage.tsx`:
+- Title: "My Fundraising Bets" with descriptive subtitle
+- Filter dropdown: All / Open / Resolved events
+- Layout: Summary → Positions Grid → Empty states
+- Loading states with skeleton cards
+- Error handling with retry functionality
+- Responsive grid: 1 column (mobile) → 2 columns (tablet) → 3 columns (desktop)
+- Empty state: "No bets yet. Explore events!" with navigation
+
+### Key Implementation Details
+
+**Position Value Calculation:**
+```
+Current Value = (Your Shares / Total Winning Shares) × Total Pool
+P&L = Current Value - Cost Basis
+P&L % = (P&L / Cost Basis) × 100
+```
+
+**Data Flow:**
+1. useUserPositions() fetches user's position PDAs from blockchain
+2. useMarkets() fetches all market data from blockchain
+3. usePortfolio() combines and enriches the data with calculations
+4. PortfolioPage displays filtered results with real-time updates
+
+**Timer Implementation:**
+- Uses date-fns `formatDistanceToNow` for human-readable relative time
+- Updates every second with proper cleanup
+- Handles past dates with "Betting closed" message
+- Clock icon for visual consistency
+
+**P&L Display:**
+- Green text and up arrow for profits
+- Red text and down arrow for losses
+- Percentage badges for quick performance assessment
+- SOL symbol formatting throughout
+
+### Testing Checklist Implemented:
+- ✅ Place bets on 2-3 events
+- ✅ Navigate to Portfolio
+- ✅ Verify countdown timers update every second
+- ✅ Test filter (All/Open/Resolved)
+- ✅ Verify P&L calculations
+- ✅ Click position card → navigates to event
+
+### Technical Features
+
+**TypeScript Integration:**
+- PositionWithMarket interface extending position data with calculated fields
+- Proper type safety for all components
+- No unused imports after optimizations
+
+**Performance Optimizations:**
+- useMemo for efficient filtering and sorting
+- TanStack Query caching with 10s stale time, 30s refetch
+- Proper cleanup of timers and subscriptions
+
+**Responsive Design:**
+- Mobile-first approach with Tailwind breakpoints
+- Touch-friendly card sizing (44px minimum tap targets)
+- Adaptive grid layouts
+
+**Error Handling:**
+- Graceful fallbacks for missing market data
+- User-friendly error messages with retry options
+- Loading states with skeleton components
+
+**DELIVERABLE:** Portfolio with fundraising terminology. Countdown timers on open events. Clear P&L display.
+
+---
