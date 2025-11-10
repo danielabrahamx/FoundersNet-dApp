@@ -1,5 +1,195 @@
 # Activity Log
 
+## 2025-06-17 - Event Resolution + Claiming Feature Implementation
+
+### Prompt 16: Event Resolution + Claiming
+
+```
+Implement admin event resolution and user winnings claiming functionality.
+
+Reference: requirements.md REQ-MARKET-013 to REQ-MARKET-016, REQ-POSITION-006 to REQ-POSITION-008
+
+1. Create `/client/src/hooks/useResolveEvent.ts`:
+   - Admin-only hook for resolving markets
+   - Supports three outcomes: YES, NO, INVALID
+   - Uses program.methods.resolveMarket()
+   - Invalidates markets cache on success
+
+2. Create `/client/src/hooks/useClaimWinnings.ts`:
+   - User hook for claiming winnings from resolved markets
+   - Derives user position PDA
+   - Uses program.methods.claimWinnings()
+   - Invalidates positions and balance cache on success
+
+3. Create `/client/src/components/admin/ResolveEventDialog.tsx`:
+   - Dialog with radio buttons for YES/NO/INVALID outcomes
+   - Shows market summary and pool information
+   - Early resolution warning for markets not past resolution date
+   - Only visible to admin users
+
+4. Create UI components:
+   - `/client/src/components/ui/radio-group.tsx` - Radix radio group
+   - `/client/src/components/ui/label.tsx` - Radix label component
+
+5. Update `/client/src/components/market/MarketHeader.tsx`:
+   - Add resolved outcome badge with appropriate colors
+   - Add admin resolve button (Resolve Early/Resolve Event)
+   - Integrate ResolveEventDialog for admin users
+   - Show outcome icon for resolved markets
+
+6. Update `/client/src/components/portfolio/PositionCard.tsx`:
+   - Wire up claim winnings functionality
+   - Show claim button for winning positions and invalid outcomes
+   - Integrate useClaimWinnings hook
+   - Handle loading state during claim
+
+7. Update `/client/src/hooks/index.ts`:
+   - Export new hooks: useResolveEvent, useClaimWinnings
+```
+
+### Analysis of Current State
+
+Existing infrastructure available:
+- Market types with MarketStatus and MarketOutcome enums
+- Admin utility functions for access control
+- Transaction toast system for user feedback
+- TanStack Query for cache management
+- All UI components (Dialog, Button, Badge, etc.)
+- Anchor program integration patterns established
+
+### Changes Made
+
+✅ **Created `/client/src/hooks/useResolveEvent.ts`**
+- Admin-only mutation hook for market resolution
+- Validates admin access using isAdmin() utility
+- Supports YES/NO/INVALID outcomes with proper enum mapping
+- Calls program.methods.resolveMarket() with market and resolver accounts
+- Shows success/error toasts and invalidates markets cache
+- Proper TypeScript error handling with user-friendly messages
+
+✅ **Created `/client/src/hooks/useClaimWinnings.ts`**
+- User mutation hook for claiming winnings
+- Derives user position PDA using standard pattern
+- Calls program.methods.claimWinnings() with required accounts
+- Invalidates positions and balance caches on success
+- Comprehensive error handling with descriptive messages
+
+✅ **Created `/client/src/components/admin/ResolveEventDialog.tsx`**
+- Full-featured dialog for market resolution
+- Radio group with three outcome options (YES/NO/INVALID)
+- Market summary showing title and pool information
+- Early resolution warning with amber styling
+- Different button text for early vs on-time resolution
+- Only renders for admin users on unresolved markets
+- Integrates seamlessly with existing UI patterns
+
+✅ **Created UI Components**:
+- **RadioGroup**: Radix-based radio button component with Circle indicators
+- **Label**: Radix-based label component with variants support
+- Both components follow existing UI patterns and dark mode support
+
+✅ **Updated `/client/src/components/market/MarketHeader.tsx`**:
+- Added resolved outcome badge with color coding:
+  * YES: Green with check icon
+  * NO: Red with check icon
+  * INVALID: Gray with check icon
+- Added admin resolve button with Settings icon
+- Button text changes based on resolution date (Resolve Early/Resolve Event)
+- Integrated ResolveEventDialog for admin workflow
+- Maintained existing responsive design and styling
+
+✅ **Updated `/client/src/components/portfolio/PositionCard.tsx`**:
+- Wired up claim winnings functionality using useClaimWinnings hook
+- Added canClaim logic for winners and invalid outcomes:
+  * Market resolved to YES + user has YES shares
+  * Market resolved to NO + user has NO shares  
+  * Market resolved to INVALID (refund)
+- Button shows loading state during claim transaction
+- Proper event handling to prevent card navigation when claiming
+- Removed unused isWinner variable
+
+✅ **Updated `/client/src/hooks/index.ts`**:
+- Added exports for useResolveEvent and useClaimWinnings
+- Maintained existing export structure
+
+### Key Features Implemented
+
+✅ **Admin Resolution System**:
+- Only admin users can resolve markets (access control)
+- Three resolution options: YES, NO, INVALID
+- Early resolution support with warning dialog
+- Market summary and pool information display
+- Proper outcome enum mapping and colors
+
+✅ **User Claiming System**:
+- Winners can claim winnings from resolved markets
+- Invalid outcomes allow refunds for all participants
+- PDA derivation for user position accounts
+- Loading states and error handling
+- Cache invalidation for real-time updates
+
+✅ **UI/UX Enhancements**:
+- Outcome badges with appropriate colors and icons
+- Admin-only resolve buttons with proper labeling
+- Early resolution warnings for safety
+- Claim buttons with loading states
+- Consistent styling with existing design system
+
+✅ **Error Handling & Feedback**:
+- Transaction success/error toasts
+- User-friendly error messages
+- Proper TypeScript error handling
+- Cache invalidation for data consistency
+
+### Technical Implementation Details
+
+**Resolution Flow**:
+1. Admin clicks "Resolve Event" or "Resolve Early"
+2. Dialog opens with market summary and outcome options
+3. Admin selects YES/NO/INVALID and confirms
+4. Transaction calls program.methods.resolveMarket()
+5. Market status updates to RESOLVED with outcome
+6. UI shows outcome badge and disables trading
+
+**Claiming Flow**:
+1. User views resolved market in portfolio
+2. Claim button appears for winners/invalid outcomes
+3. User clicks "Claim Winnings"
+4. Transaction calls program.methods.claimWinnings()
+5. User receives SOL payout to wallet
+6. Portfolio and balance caches refresh
+
+**Access Control**:
+- isAdmin() utility ensures only admin can resolve
+- ResolveEventDialog only renders for admin users
+- Market resolution only available for OPEN markets
+- Claim button only shows for appropriate outcomes
+
+### Validation
+
+✅ **TypeScript Check**: No compilation errors, strict mode passes
+✅ **Build Success**: Application builds successfully (26.96s)
+✅ **Dependencies**: Added @radix-ui/react-radio-group for UI components
+✅ **Code Quality**: Follows existing patterns and conventions
+✅ **Error Handling**: Comprehensive error handling throughout
+✅ **UI Integration**: Seamless integration with existing design system
+
+### Testing Checklist Ready
+
+The implementation is now ready for testing:
+
+- [ ] As admin, create event
+- [ ] As user, place bet  
+- [ ] As admin, click "Resolve Early"
+- [ ] Select YES/NO
+- [ ] Verify event shows as resolved
+- [ ] As winner, claim winnings
+- [ ] Verify SOL received
+
+**DELIVERABLE**: Admin can resolve events. Winners can claim winnings. Full lifecycle complete.
+
+---
+
 ## 2025-06-17 - Router Setup & Basic Page Shells
 
 ### Prompt 5: Router Setup & Basic Page Shells
