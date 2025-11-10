@@ -1,5 +1,5 @@
 import { useParams, Link } from 'react-router-dom'
-import { useMarket } from '@/hooks'
+import { useMarket, useAccountSubscription } from '@/hooks'
 import { Button } from '@/components/ui/button'
 import { MarketHeader, MarketDescription, MarketStats, PoolChart, MarketDetailSkeleton, TradingWidget } from '@/components/market'
 import { AlertCircle, ArrowLeft } from 'lucide-react'
@@ -8,6 +8,12 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 export function MarketDetail() {
   const { marketId } = useParams<{ marketId: string }>()
   const { data: market, isLoading, error } = useMarket(marketId)
+
+  // Subscribe to real-time updates for this market
+  useAccountSubscription(
+    market?.publicKey,
+    ['market', marketId!]
+  );
 
   // Show loading state
   if (isLoading) {

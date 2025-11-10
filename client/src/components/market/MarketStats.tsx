@@ -1,5 +1,6 @@
 import { Market } from '@/types'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { LiveIndicator } from '@/components/LiveIndicator'
 import { formatDistanceToNow } from 'date-fns'
 import { lamportsToSol, calculateImpliedOdds } from '@/lib/utils'
 
@@ -18,7 +19,10 @@ export function MarketStats({ market }: MarketStatsProps) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Market Statistics</CardTitle>
+        <div className="flex items-center justify-between">
+          <CardTitle>Market Statistics</CardTitle>
+          <LiveIndicator />
+        </div>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="text-center pb-4 border-b">
