@@ -1,0 +1,19 @@
+[features]
+seeds = false
+init-if-needed = true
+
+[programs.devnet]
+foundersnet = "EEZJxm2YmPHxH2VfqPXaS2k3qSmRhvKHEFMxjbzNxNfQ"
+
+[programs.testnet]
+foundersnet = "EEZJxm2YmPHxH2VfqPXaS2k3qSmRhvKHEFMxjbzNxNfQ"
+
+[programs.mainnet]
+foundersnet = "EEZJxm2YmPHxH2VfqPXaS2k3qSmRhvKHEFMxjbzNxNfQ"
+
+[provider]
+cluster = "Devnet"
+wallet = "~/.config/solana/id.json"
+
+[scripts]
+test = "bash ./scripts/test.sh"
