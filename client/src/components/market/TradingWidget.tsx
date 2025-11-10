@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Market, MarketStatus } from '@/types';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -9,8 +10,9 @@ import { useWallet } from '@/hooks/useWallet';
 import { useBalance } from '@/hooks/useBalance';
 import { useUserPositions } from '@/hooks/useUserPositions';
 import { useTransactionToast } from '@/hooks/useTransactionToast';
+import { useHasPosition } from '@/hooks/useHasPosition';
+import { usePlaceBet } from '@/hooks/usePlaceBet';
 import { calculateNewPoolRatio, calculatePotentialPayout } from '@/lib/calculations';
-import { parseTransactionError } from '@/lib/errors';
 import {
   formatSol,
   lamportsToSol,
@@ -25,10 +27,13 @@ interface TradingWidgetProps {
 }
 
 export function TradingWidget({ market }: TradingWidgetProps) {
+  const navigate = useNavigate();
   const { publicKey, connected } = useWallet();
   const { data: walletBalance = 0 } = useBalance(publicKey);
   const { data: positions = [] } = useUserPositions();
-  const { showPendingToast, showSuccessToast, showErrorToast } = useTransactionToast();
+  const { showErrorToast } = useTransactionToast();
+  const { mutate: placeBet, isPending: isPlacingBet } = usePlaceBet();
+  const hasPosition = useHasPosition(market.publicKey.toString());
 
   const [selectedOutcome, setSelectedOutcome] = useState<'yes' | 'no'>('yes');
   const [amount, setAmount] = useState<string>('');
@@ -117,7 +122,7 @@ export function TradingWidget({ market }: TradingWidgetProps) {
     setAmount(maxAmount.toFixed(2));
   };
 
-  const handlePlaceBet = async () => {
+  const handlePlaceBet = () => {
     if (!connected) {
       showErrorToast('Wallet not connected');
       return;
@@ -133,30 +138,13 @@ export function TradingWidget({ market }: TradingWidgetProps) {
       return;
     }
 
-    try {
-      // Simulate transaction flow for testing
-      const mockSignature = "5Gx7...k3Pm" + Date.now();
-      
-      // Show pending toast
-      showPendingToast(mockSignature);
-      
-      // Simulate network delay
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      // Randomly succeed or fail (for testing)
-      if (Math.random() > 0.3) {
-        showSuccessToast(
-          `Bet of ${formatSol(amountNum)} on ${selectedOutcome.toUpperCase()} placed successfully!`,
-          mockSignature
-        );
-        setAmount('');
-      } else {
-        throw new Error("Insufficient funds");
-      }
-    } catch (error) {
-      const message = parseTransactionError(error as Error);
-      showErrorToast(message);
-    }
+    placeBet({
+      marketId: market.publicKey.toString(),
+      amount: amountNum,
+      outcome: selectedOutcome,
+    });
+
+    setAmount('');
   };
 
   let buttonText = 'Place Bet';
@@ -177,6 +165,26 @@ export function TradingWidget({ market }: TradingWidgetProps) {
   } else {
     buttonText = `Place Bet on ${selectedOutcome.toUpperCase()}`;
     buttonDisabled = false;
+  }
+
+  if (hasPosition) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-xl">Place Bet</CardTitle>
+        </CardHeader>
+        <CardContent className="text-center space-y-4">
+          <AlertCircle className="w-12 h-12 mx-auto text-yellow-500" />
+          <h3 className="text-lg font-semibold">Already Placed Bet</h3>
+          <p className="text-muted-foreground">
+            You have already placed a bet on this event. Check your portfolio to see your position.
+          </p>
+          <Button onClick={() => navigate('/portfolio')} className="w-full">
+            View Portfolio
+          </Button>
+        </CardContent>
+      </Card>
+    );
   }
 
   return (
@@ -322,14 +330,14 @@ export function TradingWidget({ market }: TradingWidgetProps) {
         {/* Action Button */}
         <Button
           onClick={handlePlaceBet}
-          disabled={buttonDisabled}
+          disabled={buttonDisabled || isPlacingBet}
           className={`w-full ${
             selectedOutcome === 'yes'
               ? 'bg-green-600 hover:bg-green-700 dark:bg-green-700 dark:hover:bg-green-800'
               : 'bg-red-600 hover:bg-red-700 dark:bg-red-700 dark:hover:bg-red-800'
-          } ${buttonDisabled ? 'opacity-50 cursor-not-allowed' : ''}`}
+          } ${buttonDisabled || isPlacingBet ? 'opacity-50 cursor-not-allowed' : ''}`}
         >
-          {buttonText}
+          {isPlacingBet ? 'Placing Bet...' : buttonText}
         </Button>
       </CardContent>
     </Card>
