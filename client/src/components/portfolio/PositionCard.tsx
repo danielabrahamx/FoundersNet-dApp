@@ -2,10 +2,11 @@ import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { CountdownTimer } from '@/components/CountdownTimer';
-import { MarketStatus } from '@/types';
+import { MarketStatus, MarketOutcome } from '@/types';
 import { PositionWithMarket } from '@/hooks/usePortfolio';
 import { formatSol } from '@/lib/utils';
 import { useNavigate } from 'react-router-dom';
+import { useClaimWinnings } from '@/hooks/useClaimWinnings';
 import { ExternalLink, TrendingUp, TrendingDown } from 'lucide-react';
 
 interface PositionCardProps {
@@ -14,13 +15,18 @@ interface PositionCardProps {
 
 export function PositionCard({ position }: PositionCardProps) {
   const navigate = useNavigate();
+  const { mutate: claimWinnings, isPending: isClaiming } = useClaimWinnings();
   const { market } = position; // Market is now part of the enriched position
   
   // Use pre-calculated values from enriched position
   const { betSide, costBasis, currentValue, pnl, pnlPercent } = position;
 
   const isResolved = market.status === MarketStatus.RESOLVED;
-  const isWinner = position.isWinner;
+
+  const canClaim = isResolved && 
+                   ((market.outcome === MarketOutcome.YES && position.yesShares > 0) ||
+                    (market.outcome === MarketOutcome.NO && position.noShares > 0) ||
+                    (market.outcome === MarketOutcome.INVALID));
 
   const handleCardClick = () => {
     navigate(`/market/${market.publicKey.toString()}`);
@@ -103,16 +109,16 @@ export function PositionCard({ position }: PositionCardProps) {
         </div>
 
         {/* Action Button */}
-        {isResolved && isWinner && (
+        {canClaim && (
           <Button 
             className="w-full" 
             onClick={(e) => {
               e.stopPropagation();
-              // Placeholder for claim winnings functionality
-              console.log('Claim winnings for position:', position.publicKey.toString());
+              claimWinnings({ marketId: market.publicKey.toString() });
             }}
+            disabled={isClaiming}
           >
-            Claim Winnings
+            {isClaiming ? 'Claiming...' : 'Claim Winnings'}
           </Button>
         )}
       </CardContent>

@@ -1,13 +1,22 @@
-import { Market, MarketStatus, MarketCategory } from '@/types'
+import { Market, MarketStatus, MarketCategory, MarketOutcome } from '@/types'
 import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
 import { getTimeRemaining } from '@/lib/utils'
+import { ResolveEventDialog } from '@/components/admin/ResolveEventDialog'
+import { useWallet } from '@/hooks/useWallet'
+import { isAdmin } from '@/lib/admin'
+import { CheckCircle, Settings } from 'lucide-react'
 
 interface MarketHeaderProps {
   market: Market
 }
 
 export function MarketHeader({ market }: MarketHeaderProps) {
+  const { publicKey } = useWallet()
   const { isPast, days, hours, minutes } = getTimeRemaining(market.resolutionDate)
+  
+  const isAdminUser = isAdmin(publicKey)
+  const canResolve = isAdminUser && market.status === MarketStatus.OPEN
   
   const getCategoryColor = (category: MarketCategory) => {
     switch (category) {
@@ -28,6 +37,19 @@ export function MarketHeader({ market }: MarketHeaderProps) {
     return status === MarketStatus.OPEN 
       ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
       : 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200'
+  }
+
+  const getOutcomeColor = (outcome: MarketOutcome) => {
+    switch (outcome) {
+      case MarketOutcome.YES:
+        return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
+      case MarketOutcome.NO:
+        return 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
+      case MarketOutcome.INVALID:
+        return 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200'
+      default:
+        return 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200'
+    }
   }
 
   const formatResolutionDate = () => {
@@ -67,6 +89,24 @@ export function MarketHeader({ market }: MarketHeaderProps) {
         <Badge className={getStatusColor(market.status)}>
           {market.status}
         </Badge>
+        
+        {/* Show outcome badge if resolved */}
+        {market.status === MarketStatus.RESOLVED && market.outcome && (
+          <Badge className={getOutcomeColor(market.outcome)}>
+            <CheckCircle className="w-3 h-3 mr-1" />
+            {market.outcome}
+          </Badge>
+        )}
+        
+        {/* Admin resolve button */}
+        {canResolve && (
+          <ResolveEventDialog market={market}>
+            <Button variant="outline" size="sm">
+              <Settings className="w-3 h-3 mr-1" />
+              {isPast ? 'Resolve Event' : 'Resolve Early'}
+            </Button>
+          </ResolveEventDialog>
+        )}
       </div>
       
       <h1 className="text-3xl font-bold leading-tight">
