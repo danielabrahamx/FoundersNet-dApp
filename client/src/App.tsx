@@ -16,7 +16,7 @@ import { Toaster } from '@/components/ui/toaster'
 import { Layout } from '@/components/layout'
 import { ErrorBoundary } from '@/components/ErrorBoundary'
 import { ProtectedRoute } from '@/components/ProtectedRoute'
-import { Markets, MarketDetail, PortfolioPage, CreateMarketPage } from '@/pages'
+import { Markets, MarketDetail, PortfolioPage, CreateMarketPage, Admin } from '@/pages'
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -63,6 +63,14 @@ function App() {
                       element={
                         <ProtectedRoute>
                           <CreateMarketPage />
+                        </ProtectedRoute>
+                      } 
+                    />
+                    <Route 
+                      path="admin" 
+                      element={
+                        <ProtectedRoute>
+                          <Admin />
                         </ProtectedRoute>
                       } 
                     />
