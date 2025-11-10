@@ -18,6 +18,17 @@ export enum MarketOutcome {
 }
 
 /**
+ * Event type enum for fundraising-specific markets
+ */
+export enum EventType {
+  SERIES_A = 'Series A',
+  SERIES_B = 'Series B',
+  ACQUISITION = 'Acquisition',
+  IPO = 'IPO',
+  OTHER = 'Other',
+}
+
+/**
  * Market category enum
  */
 export enum MarketCategory {
@@ -40,6 +51,10 @@ export interface Market {
   description: string;
   /** Market category */
   category: MarketCategory;
+  /** Event type for fundraising markets */
+  eventType?: EventType;
+  /** Startup name for fundraising markets */
+  startupName?: string;
   /** Resolution date as Unix timestamp */
   resolutionDate: number;
   /** Market creator's public key */

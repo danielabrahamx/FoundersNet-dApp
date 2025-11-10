@@ -2,17 +2,17 @@ import { useState, useMemo } from 'react';
 import { useMarkets } from '@/hooks';
 import { MarketList } from '@/components/market/MarketList';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { MarketStatus, MarketCategory } from '@/types';
+import { MarketStatus, EventType } from '@/types';
 
 type SortOption = 'volume-desc' | 'resolution-asc' | 'created-desc';
 type StatusFilter = 'all' | MarketStatus;
-type CategoryFilter = 'all' | MarketCategory;
+type EventTypeFilter = 'all' | EventType;
 
 export function Markets() {
   const { data: markets = [], isLoading } = useMarkets();
   const [sortBy, setSortBy] = useState<SortOption>('volume-desc');
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
-  const [categoryFilter, setCategoryFilter] = useState<CategoryFilter>('all');
+  const [eventTypeFilter, setEventTypeFilter] = useState<EventTypeFilter>('all');
 
   const filteredAndSortedMarkets = useMemo(() => {
     let filtered = [...markets];
@@ -22,9 +22,9 @@ export function Markets() {
       filtered = filtered.filter(market => market.status === statusFilter);
     }
 
-    // Apply category filter
-    if (categoryFilter !== 'all') {
-      filtered = filtered.filter(market => market.category === categoryFilter);
+    // Apply event type filter
+    if (eventTypeFilter !== 'all') {
+      filtered = filtered.filter(market => market.eventType === eventTypeFilter);
     }
 
     // Apply sorting
@@ -42,15 +42,15 @@ export function Markets() {
     });
 
     return filtered;
-  }, [markets, sortBy, statusFilter, categoryFilter]);
+  }, [markets, sortBy, statusFilter, eventTypeFilter]);
 
   return (
     <div className="space-y-6">
       {/* Page Header */}
       <div>
-        <h1 className="text-2xl font-bold mb-2">Active Markets</h1>
+        <h1 className="text-2xl font-bold mb-2">Active Fundraising Bets</h1>
         <p className="text-muted-foreground">
-          Browse and trade on prediction markets
+          Browse and trade on startup fundraising events
         </p>
       </div>
 
@@ -69,18 +69,18 @@ export function Markets() {
             </SelectContent>
           </Select>
 
-          {/* Category Filter */}
-          <Select value={categoryFilter} onValueChange={(value: CategoryFilter) => setCategoryFilter(value)}>
+          {/* Event Type Filter */}
+          <Select value={eventTypeFilter} onValueChange={(value: EventTypeFilter) => setEventTypeFilter(value)}>
             <SelectTrigger className="w-full sm:w-[140px]">
-              <SelectValue placeholder="Category" />
+              <SelectValue placeholder="Event Type" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All Categories</SelectItem>
-              <SelectItem value={MarketCategory.SPORTS}>{MarketCategory.SPORTS}</SelectItem>
-              <SelectItem value={MarketCategory.POLITICS}>{MarketCategory.POLITICS}</SelectItem>
-              <SelectItem value={MarketCategory.CRYPTO}>{MarketCategory.CRYPTO}</SelectItem>
-              <SelectItem value={MarketCategory.ENTERTAINMENT}>{MarketCategory.ENTERTAINMENT}</SelectItem>
-              <SelectItem value={MarketCategory.OTHER}>{MarketCategory.OTHER}</SelectItem>
+              <SelectItem value="all">All Types</SelectItem>
+              <SelectItem value={EventType.SERIES_A}>{EventType.SERIES_A}</SelectItem>
+              <SelectItem value={EventType.SERIES_B}>{EventType.SERIES_B}</SelectItem>
+              <SelectItem value={EventType.ACQUISITION}>{EventType.ACQUISITION}</SelectItem>
+              <SelectItem value={EventType.IPO}>{EventType.IPO}</SelectItem>
+              <SelectItem value={EventType.OTHER}>{EventType.OTHER}</SelectItem>
             </SelectContent>
           </Select>
         </div>
