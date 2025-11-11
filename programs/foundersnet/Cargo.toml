@@ -13,3 +13,13 @@ anchor-client = "0.29.0"
 [lib]
 crate-type = ["cdylib", "lib"]
 name = "foundersnet"
+
+[features]
+idl-build = ["anchor-lang/idl-build", "anchor-spl/idl-build"]
+no-entrypoint = []
+cpi = []
+custom-heap = []
+custom-panic = []
+anchor-debug = []
+no-idl = []
+no-log-ix-name = []
