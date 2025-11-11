@@ -1,6 +1,7 @@
 use anchor_lang::prelude::*;
 use anchor_lang::solana_program::system_program;
 use std::mem::size_of;
+use std::str::FromStr;
 
 declare_id!("EEZJxm2YmPHxH2VfqPXaS2k3qSmRhvKHEFMxjbzNxNfQ");
 
@@ -269,7 +270,7 @@ pub mod foundersnet {
 }
 
 // Admin wallet address
-const ADMIN_WALLET: &str = "78BDAjB4oTdjS4S734Ge2sRWWnHGDDJmPigbp27bSQ7g";
+const ADMIN_WALLET: Pubkey = Pubkey::from_str("78BDAjB4oTdjS4S734Ge2sRWWnHGDDJmPigbp27bSQ7g").unwrap();
 
 // Events
 
