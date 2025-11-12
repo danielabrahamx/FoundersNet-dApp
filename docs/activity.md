@@ -233,3 +233,40 @@ The error occurred in the `getProgram()` function which was returning `null` bec
 - client/src/hooks/useWallet.ts - Export signing methods
 - client/src/hooks/useCreateEvent.ts - Improved error logging and messages
 - docs/activity.md (this file, appended)
+
+---
+
+## 2025-11-12 - Fix: Program ID Configuration
+
+### Prompt: Transaction Simulation Failed - Program Does Not Exist
+
+**User Request:**
+Debug: "Transaction simulation failed: Attempt to load a program that does not exist"
+
+**Root Cause Analysis:**
+The error occurred because `VITE_PROGRAM_ID` environment variable was set to a wrong/placeholder program ID. The actual deployed program ID on Solana devnet is different.
+
+**Actions Taken:**
+
+1. **Located Deployed Program ID**
+   - Found keypair file at `target/deploy/foundersnet-keypair.json`
+   - Extracted public key using: `solana-keygen pubkey target/deploy/foundersnet-keypair.json`
+   - Actual Program ID: `9puuhDpE9heWkoasZt9Vc4RS1nGfb25dchVxr7o9uUGR`
+
+2. **Updated `/client/.env`**
+   - Changed `VITE_PROGRAM_ID` from `AkWgeWixTroxjHczNkhRbLmNBFpoP45rP3Zarg25zjg3` (wrong)
+   - To: `9puuhDpE9heWkoasZt9Vc4RS1nGfb25dchVxr7o9uUGR` (correct, from deployed keypair)
+
+**Note:**
+- `.env` file is in `.gitignore` (correct security practice)
+- Environment variables are loaded by Vite at build/dev time
+- Changes require dev server reload to take effect
+
+**Result:**
+- Program ID now matches the actual deployed Solana program
+- Transactions will find the correct program on devnet
+- Error "Attempt to load a program that does not exist" should be resolved
+
+**Files Modified:**
+- client/.env - Updated VITE_PROGRAM_ID to correct deployed program ID
+- docs/activity.md (this file, appended)
