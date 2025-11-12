@@ -176,3 +176,60 @@ Set up Solana blockchain connection and wallet adapter integration:
 - client/src/App.tsx (modified) - Provider setup
 - client/tsconfig.json (modified) - Vite type support
 - docs/activity.md (this file, appended)
+
+---
+
+## 2025-11-12 - Debug: "Failed to initialize program" Error
+
+### Prompt: useCreateEvent Error on Event Creation
+
+**User Request:**
+Debug and fix: `useCreateEvent.ts:26 Uncaught (in promise) Error: Failed to initialize program`
+
+**Root Cause Analysis:**
+The error occurred in the `getProgram()` function which was returning `null` because:
+1. The wallet adapter validation was too strict - checking for `signTransaction` and `signAllTransactions` properties directly
+2. The useWallet hook wasn't exposing the signing methods needed by AnchorProvider
+3. No detailed console logging made troubleshooting difficult
+
+**Actions Taken:**
+
+1. **Enhanced `/client/src/lib/anchor.ts`**
+   - Added detailed console.error logging for each validation check:
+     * Logs when wallet is not provided
+     * Logs when publicKey is missing with wallet object
+     * Logs when signing methods are not available
+   - Improved wallet interface wrapper:
+     * Creates explicit wallet interface object with required methods
+     * Binds signing methods to wallet context (.bind(wallet))
+     * Ensures AnchorProvider receives properly structured wallet object
+   - Added try-catch error logging for better error visibility
+
+2. **Enhanced `/client/src/hooks/useWallet.ts`**
+   - Added `signTransaction` and `signAllTransactions` to the return object
+   - These methods are now exposed from the wallet adapter context
+   - Enables proper wallet interface construction in getProgram()
+
+3. **Improved `/client/src/hooks/useCreateEvent.ts`**
+   - Added console.error logs when publicKey is missing
+   - Added detailed error log when program is null with hint to check wallet connection
+   - Updated error message to be more user-friendly: "Failed to initialize program. Please ensure your wallet is connected."
+   - Improved debugging capability for future issues
+
+**Key Changes:**
+- Made wallet signing methods available through the custom useWallet hook
+- Added explicit wallet interface wrapper in getProgram() to ensure proper structure
+- Added comprehensive console logging for debugging wallet and program initialization issues
+- Improved error messages to guide users to check wallet connection
+
+**Result:**
+- Program initialization now properly handles wallet adapter methods
+- Console logging provides clear visibility into what's failing
+- Error messages guide users to fix wallet connection issues
+- Wallet-to-Anchor integration is now more robust
+
+**Files Modified:**
+- client/src/lib/anchor.ts - Enhanced wallet validation and interface wrapping
+- client/src/hooks/useWallet.ts - Export signing methods
+- client/src/hooks/useCreateEvent.ts - Improved error logging and messages
+- docs/activity.md (this file, appended)

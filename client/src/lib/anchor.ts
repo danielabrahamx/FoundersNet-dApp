@@ -9,14 +9,32 @@ import { IDL } from '@/idl/foundersnet'
  * @returns Program instance or null if wallet not properly initialized
  */
 export function getProgram(wallet: any): Program | null {
-  if (!wallet || !wallet.publicKey || !wallet.signTransaction) {
+  if (!wallet) {
+    console.error('Wallet is not provided')
+    return null
+  }
+
+  if (!wallet.publicKey) {
+    console.error('Wallet does not have a publicKey:', wallet)
+    return null
+  }
+
+  if (!wallet.signTransaction || !wallet.signAllTransactions) {
+    console.error('Wallet does not have signTransaction or signAllTransactions methods')
     return null
   }
 
   try {
+    // Create a wrapper object that matches the Wallet interface expected by AnchorProvider
+    const walletInterface = {
+      publicKey: wallet.publicKey,
+      signTransaction: wallet.signTransaction.bind(wallet),
+      signAllTransactions: wallet.signAllTransactions.bind(wallet),
+    }
+
     const provider = new AnchorProvider(
       connection,
-      wallet,
+      walletInterface,
       {
         commitment: 'confirmed',
       }

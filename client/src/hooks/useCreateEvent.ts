@@ -19,11 +19,13 @@ export function useCreateEvent() {
     mutationFn: async (data: EventFormData) => {
       try {
         if (!publicKey) {
+          console.error('Public key is missing')
           throw new Error('Wallet not connected')
         }
 
         if (!program) {
-          throw new Error('Failed to initialize program')
+          console.error('Program is null. Wallet might not be properly connected.')
+          throw new Error('Failed to initialize program. Please ensure your wallet is connected.')
         }
 
         const title = generateEventTitle(data)

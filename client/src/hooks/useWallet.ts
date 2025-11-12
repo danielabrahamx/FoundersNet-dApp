@@ -9,6 +9,8 @@ export function useWallet() {
     disconnect,
     connect,
     wallet,
+    signTransaction,
+    signAllTransactions,
   } = useWalletAdapter()
 
   const getBalance = async (): Promise<number> => {
@@ -31,6 +33,8 @@ export function useWallet() {
     disconnect,
     connect,
     wallet,
+    signTransaction,
+    signAllTransactions,
     getBalance,
   }
 }
