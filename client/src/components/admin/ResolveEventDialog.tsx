@@ -64,7 +64,7 @@ export function ResolveEventDialog({ market, children }: ResolveEventDialogProps
           <DialogDescription>
             {isEarlyResolution ? (
               <>
-                This event is still active and resolves in {timeRemaining}. 
+                This event is still active and resolves in {timeRemaining.days}d {timeRemaining.hours}h {timeRemaining.minutes}m. 
                 Early resolution will lock in the outcome immediately.
               </>
             ) : (

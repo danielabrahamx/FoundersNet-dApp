@@ -491,3 +491,25 @@ The Admin Dashboard stats showed "Total Events: 1" but the event wasn't appearin
 
 **To Verify:**
 Restart the dev server with `npm run dev` - events should now appear in the Manage Events tab
+
+## 2025-11-12 - Fix Early Resolve Dialog Error
+
+### Prompt: Fix error when resolving early as admin
+
+**User Request:**
+Fixed React error: "Objects are not valid as a React child (found: object with keys {days, hours, minutes, isPast})"
+
+**Root Cause:**
+The `ResolveEventDialog.tsx` was trying to render the entire `timeRemaining` object directly as JSX, but React doesn't allow objects as children. The `getTimeRemaining()` function returns an object with `{days, hours, minutes, isPast}` properties.
+
+**Solution:**
+Modified the DialogDescription in `ResolveEventDialog.tsx` to properly format the time string by extracting individual properties:
+- Changed from: `resolves in {timeRemaining}`
+- Changed to: `resolves in {timeRemaining.days}d {timeRemaining.hours}h {timeRemaining.minutes}m`
+
+**Files Modified:**
+- `client/src/components/admin/ResolveEventDialog.tsx` - Line 62: Fixed time display formatting
+
+**Result:**
+✅ Early resolve dialog now renders without errors
+✅ Time remaining displays in human-readable format (e.g., "2d 5h 30m")
