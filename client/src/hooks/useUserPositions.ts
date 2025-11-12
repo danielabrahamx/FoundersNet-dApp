@@ -37,6 +37,7 @@ export function useUserPositions(): UseQueryResult<Position[], Error> {
           noShares: (acc.account.noShares as any).toNumber(),
           totalCost: (acc.account.totalCost as any).toNumber(),
           lastTradeAt: (acc.account.lastTradeAt as any).toNumber(),
+          claimed: acc.account.claimed || false,
         }))
       } catch (error) {
         console.error('Failed to fetch user positions from blockchain:', error)
