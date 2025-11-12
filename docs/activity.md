@@ -409,3 +409,47 @@ The blockchain stores `event_type` as a u8 (0-4), but the React code was:
 - client/src/hooks/useMarkets.ts - Use converter in market.all()
 - client/src/hooks/useMarket.ts - Use converter in market.fetch()
 - docs/activity.md (this file, appended)
+
+---
+
+## 2025-11-12 - Pull & Deployment Analysis
+
+### Prompt 1: Check Remote Changes & Redeploy Status
+
+**User Request:**
+Pull changes from GitHub that were pushed from another device and determine if rebuilds/redeployments are needed.
+
+**Actions Taken:**
+
+1. **Git Pull Analysis:**
+   - Ran `git fetch origin --dry-run` to detect new changes
+   - Found new commit `bc10c70` (Merge PR #27) with changes not yet local
+   - Pulled changes with `git pull origin main`
+   - Successfully merged new commit
+
+2. **Change Assessment:**
+   - **Commit:** bc10c70 - "Merge pull request #27 from danielabrahamx/feat/admin-manage-events-dashboard"
+   - **Files Changed:** 4 files total (422 insertions, 29 deletions)
+   - **All Changes:** Frontend/TypeScript only - NO Rust/Program changes
+
+3. **Detailed File Changes:**
+   - `client/src/components/admin/AdminStats.tsx` - NEW (55 lines) - Admin statistics component
+   - `client/src/components/admin/ManageEvents.tsx` - MODIFIED (317 lines added) - Event management dashboard
+   - `client/src/components/admin/ResolveEventDialog.tsx` - MODIFIED (8 lines) - Minor updates
+   - `client/src/pages/Admin.tsx` - MODIFIED (71 lines) - Admin page refactor
+
+**Deployment Decision:**
+✅ **NO REBUILD NEEDED**
+✅ **NO REDEPLOYMENT NEEDED**
+
+**Reason:** All changes are frontend React/TypeScript components. The Solana program on-chain (programs/ directory) has NOT changed. The program was already deployed to Devnet with Program ID: `9puuhDpE9heWkoasZt9Vc4RS1nGfb25dchVxr7o9uUGR`
+
+**What To Do:**
+Simply restart the dev server:
+```bash
+cd client
+npm install  # (optional, if dependencies changed)
+npm run dev
+```
+
+The new admin dashboard components will be hot-reloaded at http://localhost:5173
