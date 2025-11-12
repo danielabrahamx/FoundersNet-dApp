@@ -9,7 +9,7 @@ import { useResolveEvent } from '@/hooks/useResolveEvent';
 import { useWallet } from '@/hooks/useWallet';
 import { isAdmin } from '@/lib/admin';
 import { CheckCircle, AlertCircle, Clock } from 'lucide-react';
-import { formatSol, getTimeRemaining } from '@/lib/utils';
+import { formatSol, lamportsToSol, getTimeRemaining } from '@/lib/utils';
 
 interface ResolveEventDialogProps {
   market: Market;
@@ -78,9 +78,9 @@ export function ResolveEventDialog({ market, children }: ResolveEventDialogProps
           <div className="p-3 bg-muted rounded-lg">
             <h4 className="font-medium text-sm mb-2">{market.title}</h4>
             <div className="flex items-center gap-4 text-xs text-muted-foreground">
-              <span>YES Pool: {formatSol(market.yesPool)}</span>
-              <span>NO Pool: {formatSol(market.noPool)}</span>
-              <span>Total: {formatSol(market.yesPool + market.noPool)}</span>
+              <span>YES Pool: {formatSol(lamportsToSol(market.yesPool))}</span>
+              <span>NO Pool: {formatSol(lamportsToSol(market.noPool))}</span>
+              <span>Total: {formatSol(lamportsToSol(market.yesPool + market.noPool))}</span>
             </div>
           </div>
 
