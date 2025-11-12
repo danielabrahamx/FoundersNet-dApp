@@ -270,3 +270,79 @@ The error occurred because `VITE_PROGRAM_ID` environment variable was set to a w
 **Files Modified:**
 - client/.env - Updated VITE_PROGRAM_ID to correct deployed program ID
 - docs/activity.md (this file, appended)
+
+---
+
+## 2025-11-12 - Deploy: FoundersNet Program to Solana Devnet
+
+### Prompt: Deploy Solana Program
+
+**User Request:**
+Deploy the FoundersNet Anchor program to Solana Devnet so event creation works.
+
+**Root Cause of Previous Error:**
+The program was never actually deployed to devnet, despite the keypair and build artifacts existing.
+
+**Actions Taken:**
+
+1. **Located Development Tools in WSL**
+   - Confirmed Anchor, Cargo, and Solana CLI installed in WSL Ubuntu
+   - Found tools in `~/.cargo/bin/` and `~/.local/share/solana/install/active_release/bin/`
+   - Tools weren't in PATH, required explicit paths
+
+2. **Built the Anchor Program**
+   - Ran: `anchor build` in WSL
+   - Build completed successfully despite version mismatch warnings (Anchor 0.29.0 vs 0.32.1)
+   - Warnings from SPL token dependencies about stack overflow were expected (not our code)
+   - Generated: `target/deploy/foundersnet.so`
+
+3. **Created Solana Keypair**
+   - Generated keypair for deployment wallet: `75wLW7oJXGSYKPA6Y23otmQWLWjUvGMZ2F7jh6XxHmgN`
+   - Seed phrase saved (for recovery if needed)
+
+4. **Funded Deployment Wallet**
+   - Requested airdrop: 2 SOL to deployment account
+   - Initial rate-limit error resolved on retry
+   - Verified: 2 SOL received
+
+5. **Deployed Program to Devnet**
+   - Command: `solana program deploy target/deploy/foundersnet.so`
+   - **Program ID: `9puuhDpE9heWkoasZt9Vc4RS1nGfb25dchVxr7o9uUGR`**
+   - Deployment Signature: `5WT2RBWhcmJYdADdVN3YYVxw4dgmxW3nwHAMFTjaNLRpnhmXm6vLUDkCPcptiBbN2KCRDJbsxTkZQQciXALDLeJi`
+   - Slot: 421098483
+
+6. **Verified Deployment**
+   - Ran: `solana program show 9puuhDpE9heWkoasZt9Vc4RS1nGfb25dchVxr7o9uUGR`
+   - Verified: Program executable ✅
+   - Authority: Correct wallet ✅
+   - Data Length: 257,616 bytes ✅
+   - Balance: 1.79 SOL ✅
+
+**Key Discovery:**
+The program ID extracted from the keypair (`9puuhDpE9heWkoasZt9Vc4RS1nGfb25dchVxr7o9uUGR`) was correct! It was already set in the client `.env` from our previous debugging step.
+
+**Result:**
+✅ FoundersNet program successfully deployed to Solana Devnet
+✅ Program is executable and functional
+✅ Client is already configured with correct program ID
+✅ Event creation transactions should now work
+
+**Technical Details:**
+- Build Tools: Anchor CLI 0.32.1, Cargo (Rust), Solana CLI
+- Network: Devnet (https://api.devnet.solana.com)
+- Program Authority: 75wLW7oJXGSYKPA6Y23otmQWLWjUvGMZ2F7jh6XxHmgN
+- Program Binary Size: 257.6 KB
+- Rent Exemption Reserve: 1.79 SOL
+
+**Next Steps:**
+1. Restart development server (already using correct program ID)
+2. Hard refresh browser
+3. Connect wallet and try creating an event - should now work!
+
+**Files Modified:**
+- target/deploy/foundersnet.so - Built and deployed
+- WSL deployment scripts created:
+  - build.sh - Build script
+  - deploy.sh - Build + deploy script
+  - deploy-final.sh - Final working deploy script
+- docs/activity.md (this file, appended)
