@@ -6,11 +6,7 @@ import {
   WalletProvider,
 } from '@solana/wallet-adapter-react'
 import { WalletModalProvider } from '@solana/wallet-adapter-react-ui'
-import {
-  PhantomWalletAdapter,
-  SolflareWalletAdapter,
-  TrustWalletAdapter,
-} from '@solana/wallet-adapter-wallets'
+import { PhantomWalletAdapter } from '@solana/wallet-adapter-wallets'
 import '@solana/wallet-adapter-react-ui/styles.css'
 import { Toaster } from '@/components/ui/toaster'
 import { TooltipProvider } from '@/components/ui/tooltip'
@@ -31,62 +27,58 @@ const queryClient = new QueryClient({
 function App() {
   const endpoint = import.meta.env.VITE_SOLANA_RPC_ENDPOINT || 'https://api.devnet.solana.com'
 
-  const wallets = useMemo(
-    () => [
-      new PhantomWalletAdapter(),
-      new SolflareWalletAdapter(),
-      new TrustWalletAdapter(),
-    ],
-    []
-  )
+  // Explicitly include Phantom adapter for reliable detection
+  const wallets = useMemo(() => [new PhantomWalletAdapter()], [])
 
   return (
-    <ErrorBoundary>
-      <ConnectionProvider endpoint={endpoint}>
-        <WalletProvider wallets={wallets} autoConnect>
-          <WalletModalProvider>
-            <QueryClientProvider client={queryClient}>
-              <TooltipProvider>
-                <BrowserRouter>
-                <Routes>
-                  <Route path="/" element={<Layout />}>
-                    <Route index element={<Markets />} />
-                    <Route path="event/:eventId" element={<MarketDetail />} />
-                    <Route 
-                      path="portfolio" 
-                      element={
-                        <ProtectedRoute>
-                          <PortfolioPage />
-                        </ProtectedRoute>
-                      } 
-                    />
-                    <Route 
-                      path="create" 
-                      element={
-                        <ProtectedRoute>
-                          <CreateMarketPage />
-                        </ProtectedRoute>
-                      } 
-                    />
-                    <Route 
-                      path="admin" 
-                      element={
-                        <ProtectedRoute>
-                          <Admin />
-                        </ProtectedRoute>
-                      } 
-                    />
-                  </Route>
-                </Routes>
-                <Toaster />
+    <ConnectionProvider endpoint={endpoint}>
+      <WalletProvider wallets={wallets} autoConnect>
+        <WalletModalProvider>
+          <QueryClientProvider client={queryClient}>
+            <TooltipProvider>
+              <BrowserRouter>
+                <ErrorBoundary>
+                  <Routes>
+                    <Route path="/" element={<Layout />}>
+                      <Route index element={<Markets />} />
+                      <Route path="event/:eventId" element={<MarketDetail />} />
+                      <Route
+                        path="portfolio"
+                        element={
+                          <ProtectedRoute>
+                            <PortfolioPage />
+                          </ProtectedRoute>
+                        }
+                      />
+                      <Route
+                        path="create"
+                        element={
+                          <ProtectedRoute>
+                            <CreateMarketPage />
+                          </ProtectedRoute>
+                        }
+                      />
+                      <Route
+                        path="admin"
+                        element={
+                          <ProtectedRoute>
+                            <Admin />
+                          </ProtectedRoute>
+                        }
+                      />
+                    </Route>
+                  </Routes>
+                  <Toaster />
+                </ErrorBoundary>
               </BrowserRouter>
-              </TooltipProvider>
-            </QueryClientProvider>
-          </WalletModalProvider>
-        </WalletProvider>
-      </ConnectionProvider>
-    </ErrorBoundary>
+            </TooltipProvider>
+          </QueryClientProvider>
+        </WalletModalProvider>
+      </WalletProvider>
+    </ConnectionProvider>
   )
 }
 
 export default App
+
+
