@@ -23,6 +23,7 @@
     "@radix-ui/react-tabs": "^1.1.13",
     "@radix-ui/react-toast": "^1.2.15",
     "@radix-ui/react-tooltip": "^1.2.8",
+    "@solana/wallet-adapter-base": "^0.9.23",
     "@solana/wallet-adapter-react": "^0.15.35",
     "@solana/wallet-adapter-react-ui": "^0.9.35",
     "@solana/wallet-adapter-wallets": "^0.19.32",
@@ -38,6 +39,7 @@
     "react-hook-form": "^7.66.0",
     "react-router-dom": "^6.18.0",
     "recharts": "^2.8.0",
+    "rpc-websockets": "^7.7.0",
     "tailwind-merge": "^2.0.0",
     "zod": "^3.22.4"
   },

@@ -11,8 +11,8 @@ echo "======================================"
 echo ""
 
 # Setup environment
-export PATH="/home/engine/.local/share/solana/install/active_release/bin:$PATH"
-export PATH="/home/engine/.cargo/bin:$PATH"
+export PATH="/home/abra/.local/share/solana/install/active_release/bin:$PATH"
+export PATH="/home/abra/.cargo/bin:$PATH"
 
 # Check Solana CLI
 if ! command -v solana &> /dev/null; then
@@ -27,8 +27,8 @@ if ! command -v anchor &> /dev/null; then
 fi
 
 # Check balance
-WALLET=$(solana address)
-BALANCE=$(solana balance | grep -o '[0-9.]*')
+WALLET=$(solana address -k ~/.config/solana/devnet.json)
+BALANCE=$(solana balance $WALLET | grep -o '[0-9.]*')
 echo "📍 Deployment Wallet: $WALLET"
 echo "💰 Current Balance: $BALANCE SOL"
 echo ""

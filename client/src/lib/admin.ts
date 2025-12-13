@@ -1,5 +1,10 @@
 import { PublicKey } from '@solana/web3.js';
 
+// Validate that VITE_ADMIN_WALLET is defined
+if (!import.meta.env.VITE_ADMIN_WALLET) {
+  throw new Error('VITE_ADMIN_WALLET environment variable is not defined. Please check your .env file.');
+}
+
 const ADMIN_WALLET = new PublicKey(import.meta.env.VITE_ADMIN_WALLET);
 
 /**
