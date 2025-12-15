@@ -14,6 +14,10 @@
 [build.environment]
   # Node version to use for builds
   NODE_VERSION = "18"
+  
+  # Exclude public client-side env vars from secrets scanning
+  # These VITE_* variables are intentionally exposed in the client bundle
+  SECRETS_SCAN_OMIT_KEYS = "VITE_SOLANA_NETWORK,VITE_SOLANA_RPC_ENDPOINT,VITE_ADMIN_WALLET,VITE_PROGRAM_ID"
 
 # Redirect rules (also defined in _redirects file as backup)
 [[redirects]]
