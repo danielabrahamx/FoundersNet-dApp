@@ -57,3 +57,27 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* Wallet Button Mobile Styles */
+.wallet-adapter-button {
+  @apply text-sm;
+  padding: 0.5rem 1rem !important;
+  height: auto !important;
+  min-height: 2.5rem !important;
+  white-space: nowrap !important;
+}
+
+@media (max-width: 640px) {
+  .wallet-adapter-button {
+    @apply text-xs;
+    padding: 0.5rem 0.75rem !important;
+    font-size: 0.75rem !important;
+    max-width: 120px !important;
+  }
+  
+  .wallet-adapter-button-trigger {
+    max-width: 120px !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+  }
+}

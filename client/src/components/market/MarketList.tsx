@@ -51,7 +51,7 @@ export function MarketList({ markets, isLoading }: MarketListProps) {
         <div className="space-y-4">
           <h3 className="text-lg font-medium">No events found</h3>
           <p className="text-muted-foreground">
-            Be the first to create a fundraising prediction event!
+            Connect your wallet to start betting.
           </p>
           <Button onClick={() => navigate('/create')} className="gap-2">
             <Plus className="h-4 w-4" />
