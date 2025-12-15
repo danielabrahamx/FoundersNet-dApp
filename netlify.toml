@@ -1,0 +1,49 @@
+# Netlify Configuration for FoundersNet
+# https://docs.netlify.com/configure-builds/file-based-configuration/
+
+[build]
+  # Base directory for the build
+  base = "client"
+  
+  # Command to run for production builds
+  command = "npm run build"
+  
+  # Directory to deploy (Vite's output directory)
+  publish = "dist"
+
+[build.environment]
+  # Node version to use for builds
+  NODE_VERSION = "18"
+
+# Redirect rules (also defined in _redirects file as backup)
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+# Headers (also defined in _headers file)
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-Content-Type-Options = "nosniff"
+    X-XSS-Protection = "1; mode=block"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+
+# Optimize build performance
+[build.processing]
+  skip_processing = false
+
+[build.processing.css]
+  bundle = true
+  minify = true
+
+[build.processing.js]
+  bundle = true
+  minify = true
+
+[build.processing.html]
+  pretty_urls = true
+
+[build.processing.images]
+  compress = true
